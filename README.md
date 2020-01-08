@@ -20,7 +20,7 @@ The software files can be found in the release section.
 
 ______________________________________________________________________________________________
 
-**For users who want to customize the software/device:**
+### For users who want to customize the software/device:
 
 See the commented Arduino code. Simple test functions have been left in the code (turning the built-in LED of the Arduino on and off for the purpose of troubleshooting). 
 
