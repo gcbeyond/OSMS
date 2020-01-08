@@ -3,16 +3,16 @@
 If you have any questions, comments or feedback, please contact me at katrina.laganovska@cfi.lu.lv.*
 ## The complete and updated software 
 
-Short guide to everything:
+### Short guide to everything:
 
 The software files can be found in the release section. 
 
-To use the device without making changes:
+### To use the device without making changes:
 1. Assemble the device
 2. Upload Arduino code to your Arduino microcontroller
 3. Install Android app or run the Python software
 
-How to measure the absorption spectrum:
+### How to measure the absorption spectrum:
 1. Measure the baseline (the spectrum of the LED wihtout the sample in)
 2. Insert sample
 3. Choose either Single or Continuous measurement in Desktop mode or "Capture" in the Android app. 
@@ -20,7 +20,7 @@ How to measure the absorption spectrum:
 
 ______________________________________________________________________________________________
 
-For users who want to customize the software/device: 
+### For users who want to customize the software/device: 
 
 See the commented Arduino code. Simple test functions have been left in the code (turning the built-in LED of the Arduino on and off for the purpose of troubleshooting). 
 
