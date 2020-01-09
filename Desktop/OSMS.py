@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
+#
+#The OSMS software was designed by Katrina Laganovska, University of Latvia, Institute of Solid State Physics. 
+#If you have any questions, comments or feedback, please contact me at katrina.laganovska@cfi.lu.lv.
+#
 
-# Form implementation generated from reading ui file 'Spectrino2.ui'
-#
-# Created by: PyQt5 UI code generator 5.9.2
-#
-# WARNING! All changes made in this file will be lost!
+
 
 import serial #for Serial communication
 import time   #for delay functions
@@ -13,21 +12,20 @@ import random
 import sys
 import pyqtgraph as pg
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QWidget, QInputDialog, QLineEdit
 from PyQt5.QtCore import QObject, pyqtSlot
-from PyQt5.QtGui import QPen, QFileDialog
+from PyQt5.QtGui import QPen, QFileDialog, QInputDialog
 
 
 import serial.tools.list_ports;# print([comport.device for comport in serial.tools.list_ports.comports()])
 ports=serial.tools.list_ports.comports()
 testst=list(map(str, ports))
-#arduinoport=ports[0]
 print(testst[0][:4])
-#arduinoport=ports[0]
-#print(arduinoport)
+
 
 
 arduino = serial.Serial(testst[0][:4],115200) #Create Serial port object called arduinoSerialData
-arduino.flushInput()
+arduino.flushInput() #clear any previous data
 time.sleep(2) #wait for 2 secounds for the communication to get established
 arduino.write(str.encode('3')) 
 
@@ -39,10 +37,10 @@ spectrum2=[]
 absorption=[]
 nmPlot=[]
 absorPlot=[]
-j=1
+accum=1
 average=0
 
-for i in range (0,288):
+for i in range (0,288): #initilizing arrays
     nm.append(i)
     baseline.append(i)
     baseline[i]=0
@@ -53,16 +51,17 @@ for i in range (0,288):
     spectrum2[i]=0
     absorption.append(i)
 
+    #calculating wavelengths from the formula provided by manufacturer
     k = (3.103932661*math.pow(10,2)+2.683934106*i-1.098262279*math.pow(10,-3)*math.pow(i,2)-7.817392551*math.pow(10,-6)*math.pow(i,3)+9.609636190*math.pow(10,-9)*math.pow(i,4)+4.681760466*math.pow(10,-12)*math.pow(i,5));
     nm[i]=k 
 
-for i in range (53,198):
+for i in range (53,198): #still initializing arrays
     absorPlot.append(i)
     nmPlot.append(i)
 
-class Ui_MainWindow(QObject):
+class Ui_MainWindow(QWidget):
 
-    def setupUi(self, MainWindow):
+    def setupUi(self, MainWindow): #holds the GUI
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(795, 522)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -86,7 +85,7 @@ class Ui_MainWindow(QObject):
         self.Single.setFont(font)
         self.Single.setObjectName("Single")
         self.Single.clicked.connect(self.Capture)
-        self.graphicsView = pg.PlotWidget(self.centralwidget)
+        self.graphicsView = pg.PlotWidget(self.centralwidget) #uses pyqtgraph to display results
         self.graphicsView.setGeometry(QtCore.QRect(10, 10, 771, 421))
         self.graphicsView.setMinimumSize(QtCore.QSize(771, 421))
         self.graphicsView.setXRange(440, 760, padding=0)
@@ -129,6 +128,7 @@ class Ui_MainWindow(QObject):
         font.setPointSize(10)
         self.Continuous.setFont(font)
         self.Continuous.setObjectName("Continuous")
+        self.Continuous.clicked.connect(self.CaptureCont)
         self.progressBar = QtWidgets.QProgressBar(self.centralwidget)
         self.progressBar.setGeometry(QtCore.QRect(10, 440, 118, 21))
         self.progressBar.setProperty("value", 0)
@@ -156,6 +156,7 @@ class Ui_MainWindow(QObject):
         self.actionAbsorption_at_Single_Wavelength.setObjectName("actionAbsorption_at_Single_Wavelength")
         self.actionAccumulation = QtWidgets.QAction(MainWindow)
         self.actionAccumulation.setObjectName("actionAccumulation")
+        self.actionAccumulation.triggered.connect(self.AccumulationDialog)
         self.menu_File.addAction(self.actionSave_As)
         self.menu_Setup.addAction(self.actionMeasure_Baseline)
         self.menu_Setup.addAction(self.actionAccumulation)
@@ -180,8 +181,13 @@ class Ui_MainWindow(QObject):
         self.actionAbsorption_at_Single_Wavelength.setText(_translate("MainWindow", "Absorption at Single Wavelength"))
         self.actionAccumulation.setText(_translate("MainWindow", "Accumulation "))
         
-   
-    def saveFileDialog(self):
+    def AccumulationDialog(self):
+        integer, ok=QtWidgets.QInputDialog.getInt(self, "Enter count","")
+        global accum
+        accum=integer
+        
+
+    def saveFileDialog(self): #opens SaveAs dialog and allows to save the already existing absorption file under whichever name the user chooses
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getSaveFileName(None, 'Save As', '','Text Files (*.txt)', options=options)#selectedFilter='*.txt')
@@ -192,7 +198,7 @@ class Ui_MainWindow(QObject):
             f.close()
 
 
-    def update_plot(self):
+    def update_plot(self): #updates the plot after receiving absorption values
         
         self.graphicsView.clear()
         self.graphicsView.setYRange(0,ylimit)
@@ -202,17 +208,16 @@ class Ui_MainWindow(QObject):
         self.graphicsView.plot(nmPlot,absorPlot,pen=pg.mkPen(color=(0,0,0)))
         
 
-    def Baseline_meas(self):
+    def Baseline_meas(self): #measure the baseline (the spectrum of the light source without the sample)
         
-        print('yes')
+        
         progress=0
         self.progressBar.setValue(0)
         QtCore.QCoreApplication.processEvents()
         for i in range (0,288):
             baseline[i]=0
 
-        
-        for i in range (0,j):
+        for i in range (0,accum):
           #  lbl2 = Label(window, text=i)
            # lbl2.grid(column=0, row=1)
            # window.update()
@@ -227,14 +232,13 @@ class Ui_MainWindow(QObject):
             for i in range (0,288):
                 baseline[i]+=msg[i]
             progress=progress+1
-            progresspercent=progress/j*100
-            print(progresspercent)
+            progresspercent=progress/accum*100
             self.progressBar.setValue(progresspercent)
 
             QtCore.QCoreApplication.processEvents()
                       
 
-        open("baseline.txt", "w+")
+        open("baseline.txt", "w+") #opens the file baseline.txt (located in the same place as this script) and saves the measured values
         with open("baseline.txt", "a") as outF:
             for i in range (1,288):
                 outF.write(str(baseline[i])+'\n')
@@ -248,17 +252,11 @@ class Ui_MainWindow(QObject):
         for i in range (0,288):
                 spectrum[i]=0
         
-        for i in range (0,j):
-            start=time.time()
-        #    lbl2 = Label(window, text=i)
-         #   lbl2.grid(column=0, row=1)
-          #  window.update()
-            arduino.write(str.encode('5'))  
-            #time.sleep(5)
 
+        for i in range (0,accum):
+
+            arduino.write(str.encode('5'))  
             msg=arduino.readline()  
-            #time.sleep(5)
-            end=time.time()
             msg=msg.decode().split(',')
             msg=msg[:-1]
             msg=list(map(int, msg))
@@ -266,10 +264,8 @@ class Ui_MainWindow(QObject):
             for i in range (0,288):
                 spectrum[i]+=msg[i]
             
-            print(end-start)
             progress=progress+1
-            progresspercent=progress/j*100
-            print(progresspercent)
+            progresspercent=progress/accum*100
             self.progressBar.setValue(progresspercent)
             QtCore.QCoreApplication.processEvents()
 
@@ -283,10 +279,10 @@ class Ui_MainWindow(QObject):
         global ylimit
         ylimit=0
         for i in range (53,198):
-            baseline2[i]=(baseline[i]+baseline[i-1]+baseline[i+1])/3-980*j
+            baseline2[i]=(baseline[i]+baseline[i-1]+baseline[i+1])/3-980*accum
             if(baseline2[i]<=0): 
                 baseline2[i]=1
-            spectrum2[i]=(spectrum[i]+spectrum[i-1]+spectrum[i+1])/3-980*j
+            spectrum2[i]=(spectrum[i]+spectrum[i-1]+spectrum[i+1])/3-980*accum
             if(spectrum2[i]<=0): 
                 spectrum2[i]=1
 
@@ -294,6 +290,11 @@ class Ui_MainWindow(QObject):
             average=+absorption[i]
 
         average=average/(198-53)
+
+    #uncomment these two lines and comment out the next one to save data continuously    
+    #    mytime=time.strftime('%j%H%M%S')
+    #    outA=open("absorption"+str(mytime)+".txt", 'w')
+
         outA=open('absorption.txt', 'w')
         
         #with open("absorption.txt", "a") as outA:
@@ -301,7 +302,7 @@ class Ui_MainWindow(QObject):
             absorption[i]=absorption[i]+0.0556-0.0767*average
             if(absorption[i]>ylimit):
                 ylimit=absorption[i]
-                print(ylimit)
+                
             outA.write(str(nm[i])+'\t'+str(absorption[i])+'\n')
         outA.close()
 
@@ -312,6 +313,23 @@ class Ui_MainWindow(QObject):
         self.update_plot()
        # self.graphicsView.plot(nmPlot,absorPlot)
 
+    def CaptureCont(self):
+        
+        global breaktheloop
+        breaktheloop=0
+        self.Capture()
+
+        self.STOP.clicked.connect(self.breakloop)
+        QtCore.QCoreApplication.processEvents()   
+        if(breaktheloop==0):
+            self.CaptureCont()     
+
+        #set a delay time between measurements if necessary. This would be a delay of 10 seconds
+        #time.sleep(10)
+
+    def breakloop(self):
+        global breaktheloop
+        breaktheloop=1
 
 if __name__ == "__main__":
     import sys
