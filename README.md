@@ -13,10 +13,11 @@ The software files can be found in the release section.
 3. Install Android app or run the Python software
 
 **How to measure the absorption spectrum:**
-1. Measure the baseline (the spectrum of the LED wihtout the sample in)
-2. Insert sample
-3. Choose either "Single" or "Continuous" measurement in Desktop mode or "Capture" in the Android app. 
-4. Repeat from step 2 for additional samples (however it is recommended to re-measure the baseline every once in a while)
+1. Connect to Bluetooth if using app (you'll need to pair your HC-05 module with your phone first)
+2. Measure the baseline (the spectrum of the LED wihtout the sample in)
+3. Insert sample
+4. Choose either "Single" or "Continuous" measurement in Desktop mode or "Capture" in the Android app. 
+5. Repeat from step 2 for additional samples (however it is recommended to re-measure the baseline every once in a while)
 
 Notes: 
 * Accumulation and continuous measurements are only possible in Desktop mode
@@ -26,6 +27,7 @@ Notes:
 ______________________________________________________________________________________________
 
 ### For users who want to customize the software/device:
+
 
 See the commented Arduino code. Simple test functions have been left in the code (turning the built-in LED of the Arduino on and off for the purpose of troubleshooting). 
 
