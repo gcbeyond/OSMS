@@ -1,11 +1,11 @@
 # Open-Source Miniature Spectrophotometer (OSMS)
 *The OSMS software was designed by Katrina Laganovska, University of Latvia, Institute of Solid State Physics. 
-If you have any questions, comments or feedback, please contact me at katrina.laganovska@cfi.lu.lv.*
+If you have any questions, comments or feedback, please contact me at katrina.laganovska@cfi.lu.lv. or here*
 ## The complete and updated software 
 
 ### Short guide to everything:
 
-The software files can be found in the release section. 
+The ready-to-use software files can be found in the release section and the source files have been uploaded here. 
 
 **To use the device without making changes:**
 1. Assemble the device
